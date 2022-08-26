@@ -175,3 +175,24 @@
   (print-dep-weights '{org.clojure/data.csv {:mvn/version "1.0.0"}})
   (print-dep-weights '{cnuernber/dtype-next {:mvn/version "9.022"}})
   ,,,)
+
+(defn dump-threads
+  []
+  (sequence
+    (comp
+      (map bean)
+      (map (fn [{:keys [threadId daemon threadName suspended threadState]}]
+             {:id threadId
+              :name threadName
+              :suspended suspended
+              :daemon daemon
+              :state (condp = threadState
+                       Thread$State/NEW :new
+                       Thread$State/RUNNABLE :runnable
+                       Thread$State/BLOCKED :blocked
+                       Thread$State/WAITING :waiting
+                       Thread$State/TIMED_WAITING :timed-waiting
+                       Thread$State/TERMINATED :terminated)})))
+    (.dumpAllThreads
+      (java.lang.management.ManagementFactory/getThreadMXBean)
+      false false)))
