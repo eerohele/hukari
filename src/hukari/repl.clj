@@ -9,7 +9,11 @@
            (java.net.http HttpClient HttpRequest HttpResponse$BodyHandlers)
            (java.text StringCharacterIterator)))
 
-(set! *print-namespace-maps* false)
+(defn init
+  []
+  (set! *print-namespace-maps* false)
+  (set! *print-length* 16)
+  (set! *print-level* 8))
 
 (def ^:private http-client (HttpClient/newHttpClient))
 (def ^:private body-handler (HttpResponse$BodyHandlers/ofInputStream))
