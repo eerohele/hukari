@@ -11,6 +11,9 @@
            (java.text StringCharacterIterator)))
 
 (defn init
+  "Tutkain REPL init fn.
+
+  See https://tutkain.flowthing.me/#customizing-your-repl."
   []
   (set! *print-namespace-maps* false)
   (set! *print-length* 16)
