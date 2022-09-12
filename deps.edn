@@ -6,5 +6,4 @@
         com.github.jpmonettas/flow-storm-dbg {:mvn/version "2.0.38"}
         com.github.jpmonettas/flow-storm-inst {:mvn/version "2.0.38"}
         criterium/criterium {:mvn/version "0.4.6"}
-        org.clojure/tools.analyzer.jvm {:git/url "https://github.com/clojure/tools.analyzer.jvm.git"
-                                        :sha "790cecee3e75bcc09564d3ff9c1df550ed69f58a"}}}
+        org.clojure/tools.analyzer.jvm {:mvn/version "1.2.2"}}}
