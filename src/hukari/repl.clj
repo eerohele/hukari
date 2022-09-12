@@ -9,7 +9,8 @@
             [clojure.tools.build.api :as tools.build.api])
   (:import (java.net URI URLEncoder)
            (java.net.http HttpClient HttpRequest HttpResponse$BodyHandlers)
-           (java.text StringCharacterIterator)))
+           (java.text StringCharacterIterator)
+           (java.util Base64)))
 
 (defn init
   "Tutkain REPL init fn.
@@ -205,3 +206,19 @@
     (.dumpAllThreads
       (java.lang.management.ManagementFactory/getThreadMXBean)
       false false)))
+
+(def ^:private base64-encoder (Base64/getEncoder))
+
+(defn base64-encode
+  [s]
+  (.encodeToString base64-encoder (.getBytes s)))
+
+(def ^:private base64-decoder (Base64/getDecoder))
+
+(defn base64-decode
+  [s]
+  (String. (.decode base64-decoder s) "UTF-8"))
+
+(comment
+  (-> "(def x 1)" base64-encode base64-decode)
+  ,,,)
