@@ -1,5 +1,6 @@
 (ns hukari.repl
   (:require [clj-java-decompiler.core]
+            [criterium.core :as criterium]
             [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.xml :as xml]
