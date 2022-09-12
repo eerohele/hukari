@@ -1,4 +1,10 @@
-{:deps {org.clojure/clojure {:mvn/version "1.11.0-alpha4"}
+{:deps {org.clojure/clojure {:mvn/version "1.12.0-alpha1"}
         org.clojure/data.json {:mvn/version "2.4.0"}
         io.github.clojure/tools.build {:git/tag "v0.8.1" :git/sha "7d40500"}
-        com.clojure-goes-fast/clj-java-decompiler {:mvn/version "0.3.2"}}}
+        com.clojure-goes-fast/clj-java-decompiler {:mvn/version "0.3.2"}
+        com.clojure-goes-fast/clj-memory-meter {:mvn/version "0.1.3"}
+        com.github.jpmonettas/flow-storm-dbg {:mvn/version "2.0.38"}
+        com.github.jpmonettas/flow-storm-inst {:mvn/version "2.0.38"}
+        criterium/criterium {:mvn/version "0.4.6"}
+        org.clojure/tools.analyzer.jvm {:git/url "https://github.com/clojure/tools.analyzer.jvm.git"
+                                        :sha "790cecee3e75bcc09564d3ff9c1df550ed69f58a"}}}
