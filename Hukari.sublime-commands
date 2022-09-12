@@ -1,0 +1,99 @@
+[
+  {
+    "caption": "Hukari: Search Clojars",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "((requiring-resolve 'hukari.repl/search-clojars))",
+        "output": "clipboard"
+    }
+  },
+  {
+    "caption": "Hukari: Search Maven Central",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "((requiring-resolve 'hukari.repl/search-maven-central))",
+        "output": "clipboard"
+    }
+  },
+  {
+    "caption": "Hukari: Show Dependency Weight Summary",
+    "command": "tutkain_evaluate",
+    "context": [{"key": "selector", "operator": "equal", "operand": "source.edn"}],
+    "args": {
+        "code": "((requiring-resolve 'hukari.repl/dep-weight-summary) '{$0})",
+        "inline_result": "inline"
+    }
+  },
+  {
+    "caption": "Hukari: Show Dependency Weight Information",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "((requiring-resolve 'hukari.repl/print-dep-weights) '{$0})",
+    }
+  },
+  {
+    "caption": "Hukari: Dump Threads",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "((requiring-resolve 'hukari.repl/dump-threads))",
+    }
+  },
+  {
+    "caption": "Hukari: Reset Print Length",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(set! *print-length* nil)",
+    }
+  },
+  {
+    "caption": "Hukari: Decompile Form",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(clj-java-decompiler.core/decompile $0)",
+    }
+  },
+  {
+    "caption": "Hukari: Disassemble Form",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(clj-java-decompiler.core/disassemble $0)",
+    }
+  },
+  {
+    "caption": "Hukari: Encode to Base64",
+    "command": "tutkain_evaluate",
+    "args": {
+        "scope": "input",
+        "snippet": "(hukari.repl/base64-encode \"${1}\")$0",
+        "output": "clipboard"
+    }
+  },
+  {
+    "caption": "Hukari: Quick Benchmark",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(criterium.core/quick-bench $0)"
+    }
+  },
+  {
+    "caption": "Hukari: Memory Use",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(hukari.repl/memory-use $0)"
+    }
+  },
+  {
+    "caption": "Hukari: Profile",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(clj-async-profiler.core/profile $0)"
+    }
+  },
+  {
+    "caption": "Hukari: Open Profile Flamegraph",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(do (clj-async-profiler.core/serve-files 10000) ((requiring-resolve 'clojure.java.browse/browse-url) \"http://localhost:10000\"))"
+    }
+  },
+]
