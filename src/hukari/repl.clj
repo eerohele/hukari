@@ -79,7 +79,7 @@
             result-zipper (-> response .body xml/parse zip/xml-zip)
             {:keys [group_name jar_name version]} (-> result-zipper zip/down zip/node :attrs)]
         (println)
-        (doto {(symbol group_name jar_name) {:mvn/version version}} prn)))))
+        {(symbol group_name jar_name) {:mvn/version version}}))))
 
 (comment
   (search-clojars)
