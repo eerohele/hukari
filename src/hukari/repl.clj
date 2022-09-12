@@ -10,7 +10,8 @@
   (:import (java.net URI URLEncoder)
            (java.net.http HttpClient HttpRequest HttpResponse$BodyHandlers)
            (java.text StringCharacterIterator)
-           (java.util Base64)))
+           (java.util Base64)
+           (org.openjdk.jol.info GraphLayout)))
 
 (defn init
   "Tutkain REPL init fn.
@@ -221,4 +222,29 @@
 
 (comment
   (-> "(def x 1)" base64-encode base64-decode)
+  ,,,)
+
+(defn memory-layout
+  [obj]
+  (let [layout (GraphLayout/parseInstance (into-array [obj]))]
+    (map (fn [class]
+           (let [count (.count (.getClassCounts layout) class)
+                 size (.count (.getClassSizes layout) class)]
+             {:description (.getName  class)
+              :count count
+              :avg (/ size count)
+              :sum size}))
+      (.getClasses layout))))
+
+(comment
+  (println (.toFootprint (GraphLayout/parseInstance (into-array [{:a 1}]))))
+  (memory-layout {:a 1})
+  ,,,)
+
+(defn memory-use
+  [obj]
+  (human-readable-byte-count (transduce (map :sum) + 0 (memory-layout obj))))
+
+(comment
+  (memory-use {:a 1})
   ,,,)
