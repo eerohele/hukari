@@ -39,10 +39,10 @@
     }
   },
   {
-    "caption": "Hukari: Reset Print Length",
+    "caption": "Hukari: Reset Print Length and Level",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(set! *print-length* nil)",
+        "code": "(do (set! *print-length* nil) (set! *print-level* nil))",
     }
   },
   {
