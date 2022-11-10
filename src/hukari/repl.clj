@@ -249,3 +249,34 @@
 (comment
   (memory-use {:a 1})
   ,,,)
+
+(defonce javap
+  (->
+    (ToolProvider/findFirst "javap")
+    (.orElseThrow)
+    (delay)))
+
+(defn class-path
+  [dir qualified-symbol]
+  (.getCanonicalPath
+    (io/file dir
+      (str
+        (.replace (namespace qualified-symbol) \. \/)
+        \$
+        (munge (name qualified-symbol))
+        ".class"))))
+
+(defn bytecode
+  [qualified-symbol]
+  (let [outs (StringWriter.)
+        outp (PrintWriter. outs)
+        errs (StringWriter.)
+        errp (PrintWriter. errs)
+        temp-dir (.toFile (Files/createTempDirectory "tutkain-classes-" (into-array FileAttribute [])))]
+    (try
+      (binding [*compile-path* (.getCanonicalPath temp-dir)]
+        (-> qualified-symbol namespace symbol compile)
+        (.run ^ToolProvider @javap outp errp (into-array String ["-c" "-l" "-verbose" "-constants" "-private" (class-path temp-dir qualified-symbol)]))
+        (.toString outs))
+      (finally
+        (.delete temp-dir)))))
