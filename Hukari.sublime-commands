@@ -100,7 +100,7 @@
     "caption": "Hukari: Open Profile Flamegraph",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(do (clj-async-profiler.core/serve-files 10000) ((requiring-resolve 'clojure.java.browse/browse-url) \"http://localhost:10000\"))"
+        "code": "(do ((requiring-resolve 'clj-async-profiler.core/serve-files) 10000) ((requiring-resolve 'clojure.java.browse/browse-url) \"http://localhost:10000\"))"
     }
   },
 ]
