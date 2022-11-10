@@ -46,6 +46,13 @@
     }
   },
   {
+    "caption": "Hukari: Toggle Reflection Warnings",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(set! *warn-on-reflection* (not *warn-on-reflection*))",
+    }
+  },
+  {
     "caption": "Hukari: Decompile Form",
     "command": "tutkain_evaluate",
     "args": {
