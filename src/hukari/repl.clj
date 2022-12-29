@@ -1,18 +1,36 @@
 (ns hukari.repl
-  (:require [clj-async-profiler.core]
-            [clj-java-decompiler.core]
-            [criterium.core :as criterium]
+  (:require [hato.client]
             [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.xml :as xml]
             [clojure.zip :as zip]
-            [clojure.pprint :as pprint]
-            [clojure.tools.build.api :as tools.build.api])
-  (:import (java.net URI URLEncoder)
+            [clojure.pprint :as pprint])
+  (:import (java.io PrintWriter StringWriter)
+           (java.net URI URLEncoder)
            (java.net.http HttpClient HttpRequest HttpResponse$BodyHandlers)
+           (java.nio.file Files)
+           (java.nio.file.attribute FileAttribute)
            (java.text StringCharacterIterator)
            (java.util Base64)
+           (java.util.spi ToolProvider)
            (org.openjdk.jol.info GraphLayout)))
+
+(def ^:private http-client (HttpClient/newHttpClient))
+
+(def ^:private body-handler (HttpResponse$BodyHandlers/ofInputStream))
+(def ^:private request-builder (HttpRequest/newBuilder))
+
+(defn intern-utils
+  []
+  ;; Snitch
+  (intern 'clojure.core (with-meta 'defn* (meta (requiring-resolve 'snitch.core/defn*))) (requiring-resolve 'snitch.core/defn*))
+  (intern 'clojure.core (with-meta '*fn (meta (requiring-resolve 'snitch.core/*fn))) (requiring-resolve 'snitch.core/*fn))
+  (intern 'clojure.core (with-meta 'defmethod* (meta (requiring-resolve 'snitch.core/defmethod*))) (requiring-resolve 'snitch.core/defmethod*))
+  (intern 'clojure.core (with-meta '*let (meta (requiring-resolve 'snitch.core/*let))) (requiring-resolve 'snitch.core/*let))
+
+  (create-ns 'http)
+  (doseq [[_ v] (ns-publics 'hato.client)]
+    (intern 'http (symbol (name (symbol v))) @v)))
 
 (defn init
   "Tutkain REPL init fn.
@@ -21,17 +39,54 @@
   []
   (set! *print-namespace-maps* false)
   (set! *print-length* 16)
-  (set! *print-level* 8))
+  (set! *print-level* 8)
+  (intern-utils))
 
-(def ^:private http-client (HttpClient/newHttpClient))
-(def ^:private body-handler (HttpResponse$BodyHandlers/ofInputStream))
-(def ^:private request-builder (HttpRequest/newBuilder))
+(defmacro portal
+  []
+  `(do
+     ((requiring-resolve 'datomic.dev.datafy/datafy!))
+     ((requiring-resolve 'portal.api/open) {:app false})
+     (add-tap (requiring-resolve 'portal.api/submit))))
+
+(defmacro flow-storm
+  []
+  `(do
+     (require 'flow-storm.api)
+     (flow-storm.api/local-connect)))
+
+(defmacro quick-bench
+  [& body]
+  `(do
+     (require 'criterium.core)
+     (criterium.core/quick-bench ~@body)))
+
+(defmacro decompile-form
+  [& body]
+  `(do
+     (require 'clj-java-decompiler.core)
+     (clj-java-decompiler.core/decompile ~@body)))
+
+(defmacro disassemble-form
+  [& body]
+  `(do
+     (require 'clj-java-decompiler.core)
+     (clj-java-decompiler.core/disassemble ~@body)))
+
+(defmacro profile
+  [& body]
+  `(do
+     (require 'clj-async-profiler.core)
+     (clj-async-profiler.core/profile ~@body)))
+
+(defn flamegraph
+  []
+  ((requiring-resolve 'clj-async-profiler.core/serve-files) 10000)
+  ((requiring-resolve 'clojure.java.browse/browse-url) "http://localhost:10000"))
 
 (defn search-maven-central
   ([] (search-maven-central {}))
   ([{:keys [max-results] :or {max-results 10}}]
-   (set! *print-namespace-maps* false)
-
    (print "Search Maven Central (:q to abort): ")
    (flush)
 
@@ -121,7 +176,7 @@
   Removes org.clojure/clojure and its deps from the libs map."
   [coord]
   (->
-    (tools.build.api/create-basis {:project {:deps coord}})
+    ((requiring-resolve 'tools.build.api/create-basis) {:project {:deps coord}})
     (update :libs dissoc
       'org.clojure/clojure
       'org.clojure/spec.alpha
@@ -280,3 +335,13 @@
         (.toString outs))
       (finally
         (.delete temp-dir)))))
+
+(defn add-lib-latest
+  [search]
+  (let [dep (-> ((requiring-resolve 'clojure.tools.deps.alpha.repl/find-lib*) search {:max-count 1}) first :dep)]
+    ((requiring-resolve 'clojure.tools.deps.alpha.repl/add-libs) dep)
+    dep))
+
+(comment
+  (add-lib-latest "hiccup")
+  ,,,)

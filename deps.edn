@@ -1,10 +1,20 @@
 {:deps {org.clojure/clojure {:mvn/version "1.12.0-alpha1"}
+        org.clojure/tools.deps ^:antq/exclude {:git/url "https://github.com/clojure/tools.deps.git"
+                                               :git/sha "8f8fc2571e721301b6d52e191129248355cb8c5a"}
         org.clojure/data.json {:mvn/version "2.4.0"}
-        io.github.clojure/tools.build {:git/tag "v0.8.1" :git/sha "7d40500"}
-        com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.0.0"}
-        com.clojure-goes-fast/clj-java-decompiler {:mvn/version "0.3.2"}
-        com.github.jpmonettas/flow-storm-dbg {:mvn/version "2.0.38"}
-        com.github.jpmonettas/flow-storm-inst {:mvn/version "2.0.38"}
+        io.github.clojure/tools.build {:git/tag "v0.9.0" :git/sha "11f791d"}
+        com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.0.3"}
+        com.clojure-goes-fast/clj-java-decompiler {:mvn/version "0.3.3"}
+        com.github.jpmonettas/flow-storm-dbg {:mvn/version "3.3.309"}
+        com.github.jpmonettas/flow-storm-inst {:mvn/version "3.3.309"}
+        djblue/portal {:mvn/version "0.35.0"}
         org.openjdk.jol/jol-core {:mvn/version "0.16"}
         criterium/criterium {:mvn/version "0.4.6"}
-        org.clojure/tools.analyzer.jvm {:mvn/version "1.2.2"}}}
+        org.clojars.abhinav/snitch {:mvn/version "0.1.13"}
+        org.clojure/tools.analyzer.jvm {:mvn/version "1.2.3"}
+        hato/hato {:mvn/version "0.9.0"}
+        cljfmt/cljfmt {:mvn/version "0.9.0"}
+
+        com.datomic/dev.datafy {:git/sha "4a9dffb"
+                                :git/tag "v0.1"
+                                :git/url "https://github.com/Datomic/dev.datafy.git"}}}

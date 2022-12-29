@@ -56,14 +56,14 @@
     "caption": "Hukari: Decompile Form",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(clj-java-decompiler.core/decompile $0)",
+        "code": "(hukari.repl/decompile-form $0)",
     }
   },
   {
     "caption": "Hukari: Disassemble Form",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(clj-java-decompiler.core/disassemble $0)",
+        "code": "(hukari.repl/disassemble-form $0)",
     }
   },
   {
@@ -79,7 +79,7 @@
     "caption": "Hukari: Quick Benchmark",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(criterium.core/quick-bench $0)"
+        "code": "(hukari.repl/quick-bench $0)"
     }
   },
   {
@@ -89,18 +89,26 @@
         "code": "(hukari.repl/memory-use $0)"
     }
   },
+
+  {
+    "caption": "Hukari: FlowStorm",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(hukari.repl/flow-storm)"
+    }
+  },
   {
     "caption": "Hukari: Profile",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(clj-async-profiler.core/profile $0)"
+        "code": "(hukari.repl/profile $0)"
     }
   },
   {
     "caption": "Hukari: Open Profile Flamegraph",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(do ((requiring-resolve 'clj-async-profiler.core/serve-files) 10000) ((requiring-resolve 'clojure.java.browse/browse-url) \"http://localhost:10000\"))"
+        "code": "(hukari.repl/flamegraph)"
     }
   },
   {
@@ -108,6 +116,21 @@
     "command": "tutkain_evaluate",
     "args": {
         "code": "(hukari.repl/bytecode $0)"
+    }
+  },
+  {
+    "caption": "Hukari: Portal",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(hukari.repl/portal)"
+    }
+  },
+  {
+    "caption": "Hukari: Add Latest Version of Lib",
+    "command": "tutkain_evaluate",
+    "args": {
+        "scope": "input",
+        "snippet": "(hukari.repl/add-lib-latest \"${1}\")$0"
     }
   },
 ]
