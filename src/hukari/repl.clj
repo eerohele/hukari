@@ -1,6 +1,7 @@
 (ns hukari.repl
   (:require [hato.client]
             [clojure.java.io :as io]
+            [clojure.core.server :as server]
             [clojure.string :as string]
             [clojure.xml :as xml]
             [clojure.zip :as zip]
@@ -19,6 +20,16 @@
 
 (def ^:private body-handler (HttpResponse$BodyHandlers/ofInputStream))
 (def ^:private request-builder (HttpRequest/newBuilder))
+
+(defn start-server
+  [_]
+  (let [server (server/start-server {:name "server" :port 0 :accept `server/repl :server-daemon false})
+        port (.getLocalPort server)
+        host (-> server .getInetAddress .getCanonicalHostName)
+        port-file (io/file ".repl-port")]
+    (.deleteOnExit port-file)
+    (spit port-file port)
+    (printf "Socket server listening on %s:%s\n" host port)))
 
 (defn intern-utils
   []
