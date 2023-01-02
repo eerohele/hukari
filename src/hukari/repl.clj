@@ -1,6 +1,5 @@
 (ns hukari.repl
-  (:require [hato.client]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [clojure.core.server :as server]
             [clojure.string :as string]
             [clojure.xml :as xml]
@@ -39,6 +38,7 @@
   (intern 'clojure.core (with-meta 'defmethod* (meta (requiring-resolve 'snitch.core/defmethod*))) (requiring-resolve 'snitch.core/defmethod*))
   (intern 'clojure.core (with-meta '*let (meta (requiring-resolve 'snitch.core/*let))) (requiring-resolve 'snitch.core/*let))
 
+  (require 'hato.client)
   (create-ns 'http)
   (doseq [[_ v] (ns-publics 'hato.client)]
     (intern 'http (symbol (name (symbol v))) @v)))
