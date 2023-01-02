@@ -2,11 +2,12 @@
         org.clojure/tools.deps ^:antq/exclude {:git/url "https://github.com/clojure/tools.deps.git"
                                                :git/sha "8f8fc2571e721301b6d52e191129248355cb8c5a"}
         org.clojure/data.json {:mvn/version "2.4.0"}
-        io.github.clojure/tools.build {:git/tag "v0.9.0" :git/sha "11f791d"}
+        io.github.clojure/tools.build {:git/tag "v0.9.0" :git/sha "11f791d"
+                                       :exclusions [org.clojure/tools.deps]}
         com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.0.3"}
         com.clojure-goes-fast/clj-java-decompiler {:mvn/version "0.3.3"}
         com.github.jpmonettas/flow-storm-dbg {:mvn/version "3.3.309"}
-        com.github.jpmonettas/flow-storm-inst {:mvn/version "3.3.309"}
+        com.github.jpmonettas/flow-storm-inst {:mvn/version "3.3.309" :exclusions [org.clojure/tools.deps.alpha]}
         djblue/portal {:mvn/version "0.35.0"}
         org.openjdk.jol/jol-core {:mvn/version "0.16"}
         criterium/criterium {:mvn/version "0.4.6"}
