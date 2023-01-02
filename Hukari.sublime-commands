@@ -89,12 +89,54 @@
         "code": "(hukari.repl/memory-use $0)"
     }
   },
-
   {
-    "caption": "Hukari: FlowStorm",
+    "caption": "Hukari: Start FlowStorm",
     "command": "tutkain_evaluate",
     "args": {
         "code": "(hukari.repl/flow-storm)"
+    }
+  },
+  {
+    "caption": "Hukari: Stop FlowStorm",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "(flow-storm.api/stop)"
+    }
+  },
+  {
+    "caption": "Hukari: Show FlowStorm Documentation",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "((requiring-resolve 'flow-storm.api/show-doc) ${0})",
+        "scope": "form"
+    }
+  },
+  {
+    "caption": "Hukari: Instrument Namespace",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "((requiring-resolve 'flow-storm.api/instrument-namespaces-clj) #{\"${ns}\"})"
+    }
+  },
+  {
+    "caption": "Hukari: Unstrument Namespace",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "((requiring-resolve 'flow-storm.api/uninstrument-namespaces-clj) #{\"${ns}\"})"
+    }
+  },
+  {
+    "caption": "Hukari: Instrument Form",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "#trace $0"
+    }
+  },
+  {
+    "caption": "Hukari: Instrument and Evaluate Form",
+    "command": "tutkain_evaluate",
+    "args": {
+        "code": "#rtrace $0"
     }
   },
   {
