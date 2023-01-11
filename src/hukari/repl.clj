@@ -56,7 +56,6 @@
 (defmacro portal
   []
   `(do
-     ((requiring-resolve 'datomic.dev.datafy/datafy!))
      ((requiring-resolve 'portal.api/open) {:app false})
      (add-tap (requiring-resolve 'portal.api/submit))))
 
