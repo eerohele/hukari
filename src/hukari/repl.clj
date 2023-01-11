@@ -245,8 +245,10 @@
   "Given a deps.edn coordinate representing a Maven dependency, print
   information about the size of each of its dependencies."
   [coord]
-  (pprint/print-table
-    (map #(update % :size human-readable-byte-count) (dep-weights coord))))
+  (doto
+    (map #(update % :size human-readable-byte-count) (dep-weights coord))
+    pprint/print-table
+    tap>))
 
 (comment
   (print-dep-weights '{org.clojure/data.csv {:mvn/version "1.0.0"}})
