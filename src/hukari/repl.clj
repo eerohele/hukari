@@ -182,7 +182,7 @@
   Removes org.clojure/clojure and its deps from the libs map."
   [coord]
   (->
-    ((requiring-resolve 'tools.build.api/create-basis) {:project {:deps coord}})
+    ((requiring-resolve 'clojure.tools.build.api/create-basis) {:project {:deps coord}})
     (update :libs dissoc
       'org.clojure/clojure
       'org.clojure/spec.alpha
