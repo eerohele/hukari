@@ -32,12 +32,6 @@
 
 (defn intern-utils
   []
-  ;; Snitch
-  (intern 'clojure.core (with-meta 'defn* (meta (requiring-resolve 'snitch.core/defn*))) (requiring-resolve 'snitch.core/defn*))
-  (intern 'clojure.core (with-meta '*fn (meta (requiring-resolve 'snitch.core/*fn))) (requiring-resolve 'snitch.core/*fn))
-  (intern 'clojure.core (with-meta 'defmethod* (meta (requiring-resolve 'snitch.core/defmethod*))) (requiring-resolve 'snitch.core/defmethod*))
-  (intern 'clojure.core (with-meta '*let (meta (requiring-resolve 'snitch.core/*let))) (requiring-resolve 'snitch.core/*let))
-
   (require 'hato.client)
   (create-ns 'http)
   (doseq [[_ v] (ns-publics 'hato.client)]
