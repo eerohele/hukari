@@ -1,17 +1,21 @@
 (ns hukari.repl
   (:require [clojure.java.io :as io]
+            [clojure.core.protocols :as protocols]
             [clojure.core.server :as server]
+            [clojure.datafy :refer [datafy]]
             [clojure.string :as string]
             [clojure.xml :as xml]
             [clojure.zip :as zip]
             [clojure.pprint :as pprint])
   (:import (java.io PrintWriter StringWriter)
+           (java.lang.management ManagementFactory)
            (java.net URI URLEncoder)
            (java.net.http HttpClient HttpRequest HttpResponse$BodyHandlers)
            (java.nio.file Files)
            (java.nio.file.attribute FileAttribute)
            (java.text StringCharacterIterator)
-           (java.util Base64)
+           (java.time Duration)
+           (java.util Base64 Date)
            (java.util.spi ToolProvider)
            (org.openjdk.jol.info GraphLayout)))
 
@@ -249,27 +253,6 @@
   (print-dep-weights '{cnuernber/dtype-next {:mvn/version "9.022"}})
   ,,,)
 
-(defn dump-threads
-  []
-  (sequence
-    (comp
-      (map bean)
-      (map (fn [{:keys [threadId daemon threadName suspended threadState]}]
-             {:id threadId
-              :name threadName
-              :suspended suspended
-              :daemon daemon
-              :state (condp = threadState
-                       Thread$State/NEW :new
-                       Thread$State/RUNNABLE :runnable
-                       Thread$State/BLOCKED :blocked
-                       Thread$State/WAITING :waiting
-                       Thread$State/TIMED_WAITING :timed-waiting
-                       Thread$State/TERMINATED :terminated)})))
-    (.dumpAllThreads
-      (java.lang.management.ManagementFactory/getThreadMXBean)
-      false false)))
-
 (def ^:private base64-encoder (Base64/getEncoder))
 
 (defn base64-encode
@@ -350,4 +333,223 @@
 
 (comment
   (add-lib-latest "hiccup")
+  ,,,)
+
+(extend-protocol protocols/Datafiable
+  java.net.ServerSocket
+  (datafy [^java.net.ServerSocket this]
+    {:channel (.getChannel this)
+     :inet-address (.getInetAddress this)
+     :local-port (.getLocalPort this)
+     :local-socket-address (.getLocalSocketAddress this)
+     :receive-buffer-size (.getReceiveBufferSize this)
+     :reuse-address (.getReuseAddress this)
+     :so-timeout (.getSoTimeout this)
+     :bound? (.isBound this)
+     :closed? (.isClosed this)
+     :options (into {}
+                (for [option (.supportedOptions this)]
+                  [(.name option) (datafy (.getOption this option))]))})
+
+  java.lang.Thread
+  (datafy [^java.lang.Thread this]
+    {:id (.getId this)
+     :name (.getName this)
+     :priority (.getPriority this)
+     :thread-group (.getThreadGroup this)
+     :interrupted? (.isInterrupted this)
+     :alive? (.isAlive this)
+     :daemon? (.isDaemon this)})
+
+  java.util.concurrent.ThreadPoolExecutor
+  (datafy [^java.util.concurrent.ThreadPoolExecutor this]
+    {:active-count (.getActiveCount this)
+     :completed-task-count (.getCompletedTaskCount this)
+     :core-pool-size (.getCorePoolSize this)
+     :largest-pool-size (.getLargestPoolSize this)
+     :max-pool-size (.getMaximumPoolSize this)
+     :task-count (.getTaskCount this)
+     :terminated? (.isTerminated this)
+     :terminating? (.isTerminating this)
+     :shutdown? (.isShutdown this)})
+
+  java.util.concurrent.BlockingQueue
+  (datafy [^java.util.concurrent.BlockingQueue this]
+    {:size (.size this)
+     :empty? (.isEmpty this)
+     :remaining-capacity (.remainingCapacity this)
+     :contents (vec (.toArray this))})
+
+  java.lang.management.ThreadMXBean
+  (datafy [this]
+    (map datafy (.dumpAllThreads this false false)))
+
+  java.lang.management.MemoryMXBean
+  (datafy [this]
+    {:heap-memory (datafy (.getHeapMemoryUsage this))
+     :non-heap-memory (datafy (.getNonHeapMemoryUsage this))})
+
+  java.lang.management.MemoryPoolMXBean
+  (datafy [this]
+    (let [collection-usage-threshold-supported? (.isCollectionUsageThresholdSupported this)
+          usage-threshold-supported? (.isUsageThresholdSupported this)]
+      (cond->
+        (array-map
+          :name (.getName this)
+          :type (condp = (.getType this)
+                  java.lang.management.MemoryType/HEAP :heap
+                  java.lang.management.MemoryType/NON_HEAP :non-heap)
+          :collection-usage (datafy (.getCollectionUsage this))
+          :memory-manager-names (vec (.getMemoryManagerNames this))
+          :peak-usage (datafy (.getPeakUsage this))
+          :usage (datafy (.getUsage this))
+          :collection-usage-threshold-supported? collection-usage-threshold-supported?
+          :usage-threshold-supported? usage-threshold-supported?
+          :valid? (.isValid this))
+
+        collection-usage-threshold-supported?
+        (assoc
+          :collection-usage-threshold (.getCollectionUsageThreshold this)
+          :collection-usage-threshold-exceeded? (.isCollectionUsageThresholdExceeded this)
+          :collection-usage-threshold-count (.getCollectionUsageThresholdCount this))
+
+        usage-threshold-supported?
+        (assoc
+          :usage-threshold (.getUsageThreshold this)
+          :usage-threshold-exceeded? (.isUsageThresholdExceeded this)))))
+
+  java.lang.management.GarbageCollectorMXBean
+  (datafy [this]
+    {:name (.getName this)
+     :memory-pool-names (vec (.getMemoryPoolNames this))
+     :collection-count (.getCollectionCount this)
+     :collection-time (.getCollectionTime this)})
+
+  java.lang.management.RuntimeMXBean
+  (datafy [this]
+    {:start-time (Date. (.getStartTime this))
+     :uptime (Duration/ofMillis (.getUptime this))
+     :name (.getVmName this)
+     :vendor (.getVmVendor this)
+     :version (.getVmVersion this)})
+
+  java.lang.management.CompilationMXBean
+  (datafy [this]
+    {:name (.getName this)
+     :total-compilation-time (Duration/ofMillis (.getTotalCompilationTime this))
+     :compilation-time-monitoring-supported? (.isCompilationTimeMonitoringSupported this)})
+
+  java.lang.management.ClassLoadingMXBean
+  (datafy [this]
+    {:loaded-class-count (.getLoadedClassCount this)
+     :total-loaded-class-count (.getTotalLoadedClassCount this)
+     :unloaded-class-count (.getUnloadedClassCount this)
+     :verbose? (.isVerbose this)})
+
+  java.lang.management.OperatingSystemMXBean
+  (datafy [this]
+    (array-map
+      :name (.getName this)
+      :version (.getVersion this)
+      :architecture (.getArch this)
+      :available-processors (.getAvailableProcessors this)
+      :system-load-average (.getSystemLoadAverage this)
+      :committed-virtual-size (.getCommittedVirtualMemorySize this)
+      :cpu-load (.getCpuLoad this)
+      :free-memory-size (.getFreeMemorySize this)
+      :free-physical-memory-size (.getFreePhysicalMemorySize this)
+      :free-swap-space-size (.getFreeSwapSpaceSize this)
+      :process-cpu-load (.getProcessCpuLoad this)
+      :process-cpu-time (Duration/ofNanos (.getProcessCpuTime this))
+      :total-memory-size (.getTotalMemorySize this)
+      :total-physical-memory-size (.getTotalPhysicalMemorySize this)
+      :total-swap-space-size (.getTotalSwapSpaceSize this)))
+
+  java.lang.management.ThreadInfo
+  (datafy [this]
+    (array-map
+      :thread-id (.getThreadId this)
+      :thread-name (.getThreadName this)
+      :thread-state (condp = (.getThreadState this)
+                      Thread$State/NEW :new
+                      Thread$State/RUNNABLE :runnable
+                      Thread$State/BLOCKED :blocked
+                      Thread$State/WAITING :waiting
+                      Thread$State/TIMED_WAITING :timed-waiting
+                      Thread$State/TERMINATED :terminated)
+      :daemon? (.isDaemon this)
+      :priority (.getPriority this)
+      :blocked-count (.getBlockedCount this)
+      :blocked-time (.getBlockedTime this)
+      :waited-count (.getWaitedCount this)
+      :waited-time (.getWaitedTime this)
+      :in-native? (.isInNative this)
+      :suspended? (.isSuspended this)))
+
+  java.lang.management.MemoryUsage
+  (datafy [this]
+    {:committed (.getCommitted this)
+     :init (.getInit this)
+     :max (.getMax this)
+     :used (.getUsed this)}))
+
+(defn humanize-memory-counts
+  [mem]
+  (->
+    mem
+    (update :committed human-readable-byte-count)
+    (update :init human-readable-byte-count)
+    (update :max human-readable-byte-count)
+    (update :used human-readable-byte-count)))
+
+(defn runtime-stats
+  []
+  (array-map
+    :os
+    (->
+      (ManagementFactory/getOperatingSystemMXBean)
+      (datafy)
+      (update :cpu-load #(str (.setScale (bigdec (* 100 %)) 0 BigDecimal/ROUND_HALF_UP) "%"))
+      (update :committed-virtual-size human-readable-byte-count)
+      (update :free-memory-size human-readable-byte-count)
+      (update :free-physical-memory-size human-readable-byte-count)
+      (update :free-swap-space-size human-readable-byte-count)
+      (update :total-memory-size human-readable-byte-count)
+      (update :total-physical-memory-size human-readable-byte-count)
+      (update :total-swap-space-size human-readable-byte-count))
+
+    :runtime (datafy (ManagementFactory/getRuntimeMXBean))
+
+    :memory
+    (->
+      (ManagementFactory/getMemoryMXBean)
+      (datafy)
+      (update :heap-memory humanize-memory-counts)
+      (update :non-heap-memory humanize-memory-counts))
+
+    :threads (datafy (ManagementFactory/getThreadMXBean))
+    :gc (map datafy (ManagementFactory/getGarbageCollectorMXBeans))
+
+    :class-loader
+    (->
+      (ManagementFactory/getClassLoadingMXBean)
+      (datafy)
+      (update :loaded-class-count #(pprint/cl-format nil "~,,' :D" %))
+      (update :total-loaded-class-count #(pprint/cl-format nil "~,,' :D" %)))
+
+    :compilation
+    (datafy (ManagementFactory/getCompilationMXBean))
+
+    :memory-pools
+    (map datafy (ManagementFactory/getMemoryPoolMXBeans))))
+
+(comment
+  (datafy (java.net.ServerSocket.))
+  (tap> (runtime-stats))
+
+  (doto (java.util.concurrent.LinkedBlockingQueue. 8)
+    (.put 1)
+    (.put 2)
+    (.put 3)
+    (.take))
   ,,,)

@@ -32,10 +32,10 @@
     }
   },
   {
-    "caption": "Hukari: Dump Threads",
+    "caption": "Hukari: Runtime Statistics",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "((requiring-resolve 'hukari.repl/dump-threads))",
+        "code": "(tap> ((requiring-resolve 'hukari.repl/runtime-stats)))",
     }
   },
   {
