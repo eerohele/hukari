@@ -1,21 +1,5 @@
 [
   {
-    "caption": "Hukari: Search Clojars",
-    "command": "tutkain_evaluate",
-    "args": {
-        "code": "((requiring-resolve 'hukari.repl/search-clojars))",
-        "output": "clipboard"
-    }
-  },
-  {
-    "caption": "Hukari: Search Maven Central",
-    "command": "tutkain_evaluate",
-    "args": {
-        "code": "((requiring-resolve 'hukari.repl/search-maven-central))",
-        "output": "clipboard"
-    }
-  },
-  {
     "caption": "Hukari: Show Dependency Weight Summary",
     "command": "tutkain_evaluate",
     "context": [{"key": "selector", "operator": "equal", "operand": "source.edn"}],
