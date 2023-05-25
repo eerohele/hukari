@@ -1,5 +1,14 @@
 [
   {
+    "caption": "Hukari: Reformat Innermost S-expression",
+    "command": "tutkain_evaluate",
+    "args": {
+      "code": "(binding [*print-length* nil *print-level* nil] (-> ((requiring-resolve 'cljfmt.core/reformat-form) '$0 {:indents ^:replace {#\"^\\w\" [[:inner 0]]}}) :children first))",
+      "scope": "innermost",
+      "output": "active_view"
+    }
+  },
+  {
     "caption": "Hukari: Show Dependency Weight Summary",
     "command": "tutkain_evaluate",
     "context": [{"key": "selector", "operator": "equal", "operand": "source.edn"}],
