@@ -336,6 +336,10 @@
   ,,,)
 
 (extend-protocol protocols/Datafiable
+  clojure.core.Eduction
+  (datafy [this]
+    (seq this))
+
   java.net.ServerSocket
   (datafy [^java.net.ServerSocket this]
     {:channel (.getChannel this)
