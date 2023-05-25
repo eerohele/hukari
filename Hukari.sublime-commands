@@ -21,7 +21,7 @@
     "context": [{"key": "selector", "operator": "equal", "operand": "source.edn"}],
     "args": {
         "code": "((requiring-resolve 'hukari.repl/dep-weight-summary) '{$0})",
-        "inline_result": "inline"
+        "output": "inline"
     }
   },
   {
