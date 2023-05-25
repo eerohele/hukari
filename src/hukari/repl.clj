@@ -382,7 +382,8 @@
     {:size (.size this)
      :empty? (.isEmpty this)
      :remaining-capacity (.remainingCapacity this)
-     :contents (vec (.toArray this))})
+     :contents (vec (.toArray this))
+     :head (.peek this)})
 
   java.lang.management.ThreadMXBean
   (datafy [this]
