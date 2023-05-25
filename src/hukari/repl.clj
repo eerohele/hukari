@@ -24,8 +24,6 @@
 (def ^:private body-handler (HttpResponse$BodyHandlers/ofInputStream))
 (def ^:private request-builder (HttpRequest/newBuilder))
 
-(future (require 'jedi-time.core))
-
 (defn start-server
   [_]
   (let [server (server/start-server {:name "server" :port 0 :accept `server/repl :server-daemon false})
