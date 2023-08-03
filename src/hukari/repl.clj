@@ -1,5 +1,6 @@
 (ns hukari.repl
-  (:require [clojure.java.io :as io]
+  (:require [clojure.edn :as edn]
+            [clojure.java.io :as io]
             [clojure.core.protocols :as protocols]
             [clojure.core.server :as server]
             [clojure.datafy :refer [datafy]]
@@ -557,4 +558,63 @@
     (.put 2)
     (.put 3)
     (.take))
+  ,,,)
+
+(import '(java.net URI))
+(import '(java.net.http HttpClient HttpRequest HttpRequest$BodyPublishers HttpClient$Redirect HttpResponse$BodyHandlers))
+(require '[clojure.repl.deps :as deps])
+
+(deps/add-lib 'org.clojure/data.json)
+(require '[clojure.data.json :as json])
+
+(defn http-post
+  [uri & {:keys [headers body]}]
+  (let [http-client (.. (HttpClient/newBuilder) (followRedirects HttpClient$Redirect/NORMAL) (build))
+        body-handler (HttpResponse$BodyHandlers/ofInputStream)
+        request-builder (HttpRequest/newBuilder)
+        _ (run! (fn [[header value]] (.header request-builder header value)) headers)
+        request (.. request-builder
+                  (uri uri)
+                  (POST (HttpRequest$BodyPublishers/ofString body))
+                  (build))
+        response (.send http-client request body-handler)]
+    (with-open [reader (-> response .body io/reader)]
+      (json/read reader :key-fn keyword))))
+
+(defn fmt
+  [form]
+  (binding [*print-length* nil *print-level* nil]
+    (->
+      ((requiring-resolve 'cljfmt.core/reformat-form) form {:indents ^:replace {#"^w" [[:inner 0]]}})
+      :children
+      peek)))
+
+(comment
+  (fmt '(inc 1))
+  ,,,)
+
+(defn strip-markdown
+  [s]
+  (let [lines (string/split-lines s)
+        lines (if (string/starts-with? (-> lines first string/trim) "```") (rest lines) lines)]
+    (string/join \newline
+      (if (string/starts-with? (-> lines last string/trim) "```")
+        (butlast lines)
+        lines))))
+
+(defn ai
+  [prompt]
+  (let [response (http-post (URI/create "https://api.openai.com/v1/chat/completions")
+                   {:headers {"Content-Type" "application/json"
+                              "Authorization" (format "Bearer %s" (System/getenv "OPENAI_API_KEY"))}
+                    :body (json/write-str {:model "gpt-3.5-turbo"
+                                           :n 1
+                                           :messages [{:role "system" :content "You are a code generating tool. Return just the code, with no explanation, context, or comments in the code."}
+                                                      {:role "user" :content prompt}]})})
+        code (-> response :choices peek :message :content)]
+    (binding [*read-eval* false]
+      (-> code strip-markdown read-string fmt))))
+
+(comment
+  (ai "Clojure Fizzbuzz implementation")
   ,,,)

@@ -69,6 +69,15 @@
     }
   },
   {
+    "caption": "Hukari: Artificial Intelligence",
+    "command": "tutkain_evaluate",
+    "args": {
+        "scope": "input",
+        "snippet": "(hukari.repl/ai \"${1}\")$0",
+        "output": "clipboard"
+    }
+  },
+  {
     "caption": "Hukari: Quick Benchmark",
     "command": "tutkain_evaluate",
     "args": {
