@@ -313,11 +313,12 @@
 
 (defn bytecode
   [qualified-symbol]
-  (let [outs (StringWriter.)
-        outp (PrintWriter. outs)
-        errs (StringWriter.)
-        errp (PrintWriter. errs)
-        temp-dir (.toFile (Files/createTempDirectory "tutkain-classes-" (into-array FileAttribute [])))]
+  (assert (qualified-symbol? qualified-symbol))
+  (with-open [outs (StringWriter.)
+              outp (PrintWriter. outs)
+              errs (StringWriter.)
+              errp (PrintWriter. errs)
+              temp-dir (.toFile (Files/createTempDirectory "tutkain-classes-" (into-array FileAttribute [])))]
     (try
       (binding [*compile-path* (.getCanonicalPath temp-dir)]
         (some-> qualified-symbol namespace symbol compile)
