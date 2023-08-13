@@ -313,19 +313,18 @@
 
 (defn bytecode
   [qualified-symbol]
-  (assert (qualified-symbol? qualified-symbol))
   (with-open [outs (StringWriter.)
               outp (PrintWriter. outs)
               errs (StringWriter.)
-              errp (PrintWriter. errs)
-              temp-dir (.toFile (Files/createTempDirectory "tutkain-classes-" (into-array FileAttribute [])))]
-    (try
-      (binding [*compile-path* (.getCanonicalPath temp-dir)]
-        (some-> qualified-symbol namespace symbol compile)
-        (.run ^ToolProvider @javap outp errp (into-array String ["-c" "-l" "-verbose" "-constants" "-private" (class-path temp-dir qualified-symbol)]))
-        (.toString outs))
-      (finally
-        (.delete temp-dir)))))
+              errp (PrintWriter. errs)]
+    (let [temp-dir (.toFile (Files/createTempDirectory "tutkain-classes-" (into-array FileAttribute [])))]
+      (try
+        (binding [*compile-path* (.getCanonicalPath temp-dir)]
+          (some-> qualified-symbol namespace symbol compile)
+          (.run ^ToolProvider @javap outp errp (into-array String ["-c" "-l" "-verbose" "-constants" "-private" (class-path temp-dir qualified-symbol)]))
+          (println (.toString outs)))
+        (finally
+          (.delete temp-dir))))))
 
 (defn add-lib-latest
   [search]

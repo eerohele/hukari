@@ -158,8 +158,10 @@
   {
     "caption": "Hukari: Bytecode",
     "command": "tutkain_evaluate",
+    "context": [{"key": "selector", "operator": "equal", "operand": "meta.symbol"}],
     "args": {
-        "code": "(hukari.repl/bytecode $0)"
+        "scope": "form",
+        "code": "(hukari.repl/bytecode `$0)"
     }
   },
   {
