@@ -497,7 +497,30 @@
     {:committed (.getCommitted this)
      :init (.getInit this)
      :max (.getMax this)
-     :used (.getUsed this)}))
+     :used (.getUsed this)})
+
+  java.net.URI
+  (datafy [this]
+    (sorted-map
+      :absolute? (.isAbsolute this)
+      :ascii-string (.toASCIIString this)
+      :authority (.getAuthority this)
+      :fragment (.getFragment this)
+      :host (.getHost this)
+      :opaque? (.isOpaque this)
+      :path (.getPath this)
+      :port (.getPort this)
+      :query (.getQuery this)
+      :raw-authority (.getRawAuthority this)
+      :raw-fragment (.getRawFragment this)
+      :raw-path (.getRawPath this)
+      :raw-query (.getRawQuery this)
+      :raw-scheme-specific-part (.getRawSchemeSpecificPart this)
+      :raw-user-info (.getRawUserInfo this)
+      :scheme (.getScheme this)
+      :scheme-specific-part (.getSchemeSpecificPart this)
+      :string (.toString this)
+      :user-info (.getUserInfo this))))
 
 (defn humanize-memory-counts
   [mem]
