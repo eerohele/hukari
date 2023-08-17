@@ -328,6 +328,10 @@
         (finally
           (.delete temp-dir))))))
 
+(comment
+  (bytecode `class-path)
+  ,,,)
+
 (defn add-lib-latest
   [search]
   (let [dep (-> ((requiring-resolve 'clojure.tools.deps.alpha.repl/find-lib*) search {:max-count 1}) first :dep)]
