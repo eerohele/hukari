@@ -278,7 +278,7 @@
     (map (fn [class]
            (let [count (.count (.getClassCounts layout) class)
                  size (.count (.getClassSizes layout) class)]
-             {:description (.getName  class)
+             {:description (.getName class)
               :count count
               :avg (/ size count)
               :sum size}))
