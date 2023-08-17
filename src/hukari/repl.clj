@@ -1,6 +1,5 @@
 (ns hukari.repl
-  (:require [clojure.edn :as edn]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [clojure.core.protocols :as protocols]
             [clojure.core.server :as server]
             [clojure.datafy :refer [datafy]]
