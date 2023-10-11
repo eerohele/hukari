@@ -393,7 +393,15 @@
 
   java.lang.management.ThreadMXBean
   (datafy [this]
-    (map datafy (.dumpAllThreads this false false)))
+    {:threads (map datafy (.dumpAllThreads this false false))
+     :deadlocked-threads (vec (.findDeadlockedThreads this))
+     :thread-ids (vec (.getAllThreadIds this))
+     :thread-cpu-time (.getCurrentThreadCpuTime this)
+     :thread-user-time (.getCurrentThreadUserTime this)
+     :daemon-thread-count (.getDaemonThreadCount this)
+     :peak-thread-count (.getPeakThreadCount this)
+     :thread-count (.getThreadCount this)
+     :started-thread-count (.getTotalStartedThreadCount this)})
 
   java.lang.management.MemoryMXBean
   (datafy [this]
