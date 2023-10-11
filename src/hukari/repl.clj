@@ -525,7 +525,24 @@
       :scheme (.getScheme this)
       :scheme-specific-part (.getSchemeSpecificPart this)
       :string (.toString this)
-      :user-info (.getUserInfo this))))
+      :user-info (.getUserInfo this)))
+
+  java.util.Locale
+  (datafy [this]
+    {:country (.getCountry this)
+     :display-country (.getDisplayCountry this)
+     :display-language (.getDisplayLanguage this)
+     :display-name (.getDisplayName this)
+     :display-script (.getDisplayScript this)
+     :display-variant (.getDisplayVariant this)
+     :iso-3-country (.getISO3Country this)
+     :iso-3-language (.getISO3Language this)
+     :language (.getLanguage this)
+     :script (.getScript this)
+     :unicode-locale-attributes (.getUnicodeLocaleAttributes this)
+     :variant (.getVariant this)
+     :has-extensions? (.hasExtensions this)
+     :language-tag (.toLanguageTag this)}))
 
 (defn humanize-memory-counts
   [mem]
