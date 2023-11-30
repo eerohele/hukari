@@ -550,7 +550,56 @@
      :unicode-locale-attributes (.getUnicodeLocaleAttributes this)
      :variant (.getVariant this)
      :has-extensions? (.hasExtensions this)
-     :language-tag (.toLanguageTag this)}))
+     :language-tag (.toLanguageTag this)})
+
+  java.time.Duration
+  (datafy [this]
+    {:negative? (.isNegative this)
+     :positive? (.isPositive this)
+     :zero? (.isZero this)
+     :days (.toDays this)
+     :hours (.toHours this)
+     :millis (.toMillis this)
+     :minutes (.toMinutes this)
+     :nanos (.toNanos this)
+     :seconds (.toSeconds this)
+     :iso-8601-string (.toString this)})
+
+  java.time.temporal.TemporalUnit
+  (datafy [this]
+    {:duration (datafy (.getDuration this))
+     :date-based? (.isDateBased this)
+     :duration-estimated? (.isDurationEstimated this)
+     :time-based? (.isTimeBased this)
+     :name (.toString this)})
+
+  java.util.Properties
+  (datafy [this]
+    (into {} this))
+
+  javax.sql.DataSource
+  (datafy [this]
+    {:connection (datafy (.getConnection this))
+     :login-timeout (datafy (Duration/ofSeconds (.getLoginTimeout this)))})
+
+  java.sql.Connection
+  (datafy [this]
+    {:auto-commit (.getAutoCommit this)
+     :catalog (.getCatalog this)
+     :client-info (datafy (.getClientInfo this))
+     :holdability (case (.getHoldability this)
+                    1 :hold-cursors-over-commit
+                    2 :close-cursors-at-commit)
+     :network-timeout (datafy (Duration/ofMillis (.getNetworkTimeout this)))
+     :schema (.getSchema this)
+     :transaction-isolation (case (.getTransactionIsolation this)
+                              1 :read-uncommitted
+                              2 :read-committed
+                              3 :repeatable-read
+                              4 :serializable
+                              5 :none)
+     :closed? (.isClosed this)
+     :read-only? (.isReadOnly this)}))
 
 (defn humanize-memory-counts
   [mem]
