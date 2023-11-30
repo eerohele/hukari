@@ -695,3 +695,19 @@
                             [?duration-in-ms body]
                             [2000 (cons ?duration-in-ms body)])]
       `(~time* ~duration (fn [] ~@body)))))
+
+(defn enable-reflection-warnings!
+  "Given a regexp pattern, for each namespace whose name matches the pattern,
+  set *warn-on-reflections* to true and reload the namespace.
+
+  Optionally, pass an entry point namespace as the first arg to load it prior
+  to namespace discovery."
+  ([re]
+   (enable-reflection-warnings! re nil))
+  ([entry-point-ns re]
+   (some-> entry-point-ns require)
+   (let [matching-nses (filter #(re-matches re (str (ns-name %))) (all-ns))]
+     (run! #(binding [*ns* %]
+              (set! *warn-on-reflection* true)
+              (require (ns-name *ns*) :reload))
+       matching-nses))))
