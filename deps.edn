@@ -3,8 +3,7 @@
         io.github.clojure/tools.build {:mvn/version "0.9.5"}
         com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.0.3"}
         com.clojure-goes-fast/clj-java-decompiler {:mvn/version "0.3.4"}
-        com.github.jpmonettas/flow-storm-dbg {:mvn/version "3.3.309"}
-        com.github.jpmonettas/flow-storm-inst {:mvn/version "3.3.309" :exclusions [org.clojure/tools.deps.alpha]}
+        com.github.flow-storm/flow-storm-dbg {:mvn/version "3.8.3"}
         org.openjdk.jol/jol-core {:mvn/version "0.16"}
         criterium/criterium {:mvn/version "0.4.6"}
         org.clojars.abhinav/snitch {:mvn/version "0.1.13"}

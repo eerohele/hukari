@@ -59,9 +59,7 @@
 
 (defmacro flow-storm
   []
-  `(do
-     (require 'flow-storm.api)
-     (flow-storm.api/local-connect)))
+  `((requiring-resolve 'flow-storm.api/local-connect)))
 
 (defmacro quick-bench
   [& body]
