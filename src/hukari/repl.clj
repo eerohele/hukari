@@ -46,8 +46,6 @@
 
   See https://tutkain.flowthing.me/#customizing-your-repl."
   []
-  ((requiring-resolve 'clj-commons.pretty.repl/install-pretty-exceptions))
-  (alter-var-root (requiring-resolve 'clj-commons.ansi/*color-enabled*) (constantly false))
   (set! *print-namespace-maps* false)
   (set! *print-length* 16)
   (set! *print-level* 8)
