@@ -696,7 +696,7 @@
    (enable-reflection-warnings! re nil))
   ([entry-point-ns re]
    (some-> entry-point-ns require)
-   (let [matching-nses (filter #(re-matches re (str (ns-name %))) (all-ns))]
+   (let [matching-nses (eduction (filter #(re-matches re (str (ns-name %)))) (all-ns))]
      (run! #(binding [*ns* %]
               (set! *warn-on-reflection* true)
               (require (ns-name *ns*) :reload))
