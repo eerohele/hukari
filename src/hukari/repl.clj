@@ -709,5 +709,5 @@
    (let [matching-nses (filter #(re-matches re (str (ns-name %))) (all-ns))]
      (run! #(binding [*ns* %]
               (set! *warn-on-reflection* true)
-              (require (ns-name *ns*) :reload-all))
+              (require (ns-name *ns*) :reload))
        matching-nses))))
