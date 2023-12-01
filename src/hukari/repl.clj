@@ -622,8 +622,8 @@
   "Given a regexp pattern, for each namespace whose name matches the pattern,
   set *warn-on-reflections* to true and reload the namespace.
 
-  Optionally, pass an entry point namespace as the first arg to load it prior
-  to namespace discovery."
+  Optionally, pass a symbol naming an entry point namespace as the first arg to
+  load it prior to namespace discovery."
   ([re]
    (enable-reflection-warnings! re nil))
   ([entry-point-ns re]
@@ -633,3 +633,7 @@
               (set! *warn-on-reflection* true)
               (require (ns-name *ns*) :reload))
        matching-nses))))
+
+(comment
+  (enable-reflection-warnings! 'hukari.repl #"^hukari\..*")
+  ,,,)
