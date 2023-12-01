@@ -327,16 +327,6 @@
   (bytecode `class-path)
   ,,,)
 
-(defn add-lib-latest
-  [search]
-  (let [dep (-> ((requiring-resolve 'clojure.tools.deps.alpha.repl/find-lib*) search {:max-count 1}) first :dep)]
-    ((requiring-resolve 'clojure.tools.deps.alpha.repl/add-libs) dep)
-    dep))
-
-(comment
-  (add-lib-latest "hiccup")
-  ,,,)
-
 (extend-protocol protocols/Datafiable
   clojure.core.Eduction
   (datafy [this]
