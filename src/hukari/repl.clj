@@ -619,8 +619,9 @@
       `(~time* ~duration (fn [] ~@body)))))
 
 (defn set-reflection-warnings!
-  "Given a regexp pattern, for each namespace whose name matches the pattern,
-  toggle reflection warnings on or off and reload the namespace.
+  "Given a regexp pattern and a boolean, for each namespace whose name matches
+  the pattern, toggle reflection warnings on or off as indicated by the
+  boolean and reload the namespace.
 
   Optionally, pass a symbol naming an entry point namespace as the first arg to
   load it prior to namespace discovery."
