@@ -625,7 +625,7 @@
   Optionally, pass a symbol naming an entry point namespace as the first arg to
   load it prior to namespace discovery."
   ([re]
-   (enable-reflection-warnings! re nil))
+   (enable-reflection-warnings! nil re))
   ([entry-point-ns re]
    (some-> entry-point-ns require)
    (let [matching-nses (eduction (filter #(re-matches re (str (ns-name %)))) (all-ns))]
