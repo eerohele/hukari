@@ -12,7 +12,9 @@
            (java.time Duration)
            (java.util Base64 Date)
            (java.util.spi ToolProvider)
-           (org.openjdk.jol.info GraphLayout)))
+           (org.openjdk.jol.info GraphLayout)
+           (com.github.vertical_blank.sqlformatter SqlFormatter)
+           (com.github.vertical_blank.sqlformatter.languages Dialect)))
 
 (defn start-server
   [& {:keys [port] :or {port 0}}]
@@ -638,3 +640,10 @@
 (comment
   (set-reflection-warnings! 'hukari.repl #"^hukari\..*" true)
   ,,,)
+
+(def ^:private sql-formatter
+  (SqlFormatter/of Dialect/PostgreSql))
+
+(defn format-sql
+  [s]
+  (println (.format sql-formatter s)))
