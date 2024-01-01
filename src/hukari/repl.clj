@@ -15,8 +15,8 @@
            (org.openjdk.jol.info GraphLayout)))
 
 (defn start-server
-  [_]
-  (let [server (server/start-server {:name "server" :port 0 :accept `server/repl :server-daemon false})
+  [& {:keys [port] :or {port 0}}]
+  (let [server (server/start-server {:name "server" :port port :accept `server/repl :server-daemon false})
         port (.getLocalPort server)
         host (-> server .getInetAddress .getCanonicalHostName)
         port-file (io/file ".repl-port")]
