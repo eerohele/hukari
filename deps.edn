@@ -11,3 +11,5 @@
         hato/hato {:mvn/version "0.9.0"}
         cljfmt/cljfmt {:mvn/version "0.9.0"}
         com.datomic/local {:mvn/version "1.0.267"}}}
+        com.datomic/local {:mvn/version "1.0.267"}
+        com.github.vertical-blank/sql-formatter {:mvn/version "2.0.4"}}}
