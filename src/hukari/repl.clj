@@ -3,7 +3,9 @@
             [clojure.core.protocols :as protocols]
             [clojure.core.server :as server]
             [clojure.datafy :refer [datafy]]
-            [clojure.pprint :as pprint])
+            [clojure.pprint :as pprint]
+            [hukari.jfr]
+            [clojure.string :as string])
   (:import (java.io PrintWriter StringWriter)
            (java.lang.management ManagementFactory)
            (java.nio.file Files)
@@ -41,6 +43,10 @@
   (set! *print-namespace-maps* false)
   (set! *print-length* 16)
   (set! *print-level* 8)
+  ((requiring-resolve 'clojure.spec.test.alpha/instrument))
+  #_(try
+      (when-some [f (requiring-resolve 'malli.dev/start!)] (f))
+      (catch java.io.FileNotFoundException _))
   (intern-utils))
 
 (defmacro portal
@@ -647,3 +653,119 @@
 (defn format-sql
   [s]
   (println (.format sql-formatter s)))
+
+(defn file->bytes
+  "Given a string path to a file, return the file content as bytes."
+  [s]
+  (-> s io/file .toPath Files/readAllBytes))
+
+(defn prune-stack-trace
+  ([]
+   (prune-stack-trace *e))
+  ([ex]
+   (when ex
+     (let [demunge (requiring-resolve 'clojure.repl/demunge)
+           ns* (ns-name *ns*)]
+       (->
+         (Throwable->map ex)
+         (update :via
+           (fn [via]
+             (mapv (fn [via] (update-in via [:at 0] (comp symbol demunge pr-str))) via)))
+         (update
+           :trace (fn [trace]
+                    ;; TODO: Print maybe three lines of context before and after?
+                    (into []
+                      (comp
+                        (remove
+                          (fn [elem]
+                            (#{'clojure.lang.RestFn 'clojure.lang.AFn} (first elem))))
+                        (map
+                          (fn [elem]
+                            (update elem 0 (fn [trace] (-> trace name demunge symbol)))))
+                        (remove
+                          (fn [elem]
+                            (and
+                              (some->> elem first name (re-matches #"^eval\d+$"))
+                              (= 'invokeStatic (some-> elem second)))))
+                        (drop-while
+                          (fn [elem]
+                            (not= ns* (some-> elem first namespace symbol))))
+                        (take-while
+                          (fn [elem]
+                            (= ns* (some-> elem first namespace symbol)))))
+                      trace))))))))
+
+(defn pst
+  ([] (pst *e))
+  ([ex]
+   (when ex
+     (let [{:keys [via cause trace phase]
+            :or {phase :evaluation}} (prune-stack-trace ex)
+           ;; TODO: Will writer be GC'ed?
+           writer (clojure.java.io/writer *err*)
+           f (first via)]
+
+       (let [phase-name (some-> phase name string/upper-case (string/replace #"-" " "))]
+         (.append writer "── ")
+         (.append writer phase-name)
+         (.append writer " ERROR ")
+         (dotimes [_ (- 100 10 (count phase-name))]
+           (.append writer "─")))
+
+       (.newLine writer)
+       (if (instance? ClassCastException ex)
+         (let [[_ expected actual] (re-matches #"^class (.+?) cannot be cast to class (.+) \(.+" (:message f))]
+           (.append writer (format "cannot cast %s to %s" actual expected)))
+         (.append writer (:message f)))
+       (.append writer " (")
+       (.append writer (-> f :type name))
+       (.append writer ")")
+       (.newLine writer)
+
+       ;; Don't print cause if already printed
+       (when-not (= (-> f :message) cause)
+         (.append writer "  ‼ ")
+         (.append writer cause)
+         (.append writer " ‼")
+         (.newLine writer))
+
+       (.append writer "  @ ")
+
+       ;; FIXME: For (throw (ex-info "Boom!" {:a :1}))
+       (let [[class method file line] (:at f)]
+         (.append writer (pr-str class))
+         (.append writer " ")
+         (.append writer (name method))
+         (.append writer " (")
+         (.append writer file)
+         (.append writer \:)
+         (.append writer (str line))
+         (.append writer ")"))
+
+       (.newLine writer)
+
+       (.append writer "  …")
+       (.newLine writer)
+
+       (when (seq trace)
+         (run!
+           (fn [[class _ file line]]
+             (.append writer "  ")
+             (if (re-matches #"^eval\d+$" (name class))
+               (.append writer (format "FROM EVAL IN NAMESPACE %s" (namespace class)))
+               (.append writer (pr-str class)))
+             (.append writer " (")
+             (.append writer file)
+             (.append writer ":")
+             (.append writer (str line))
+             (.append writer ")")
+             (.newLine writer))
+           trace)
+
+         (.append writer "  …")
+         (.newLine writer))
+
+       (dotimes [_ 100]
+         (.append writer "─"))
+
+       (.flush writer)))))
