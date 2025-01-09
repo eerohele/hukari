@@ -797,3 +797,12 @@
 
     :else
     ((requiring-resolve 'malli.generator/generate) x)))
+
+(defonce ^:private -tab nil)
+
+(defn tab
+  []
+  (if -tab
+    ((requiring-resolve 'clojure.java.browse/browse-url)
+     ((requiring-resolve 'tab.api/address) -tab))
+    (alter-var-root #'-tab (fn [_] ((requiring-resolve 'tab.api/run))))))

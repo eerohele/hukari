@@ -173,11 +173,10 @@
     }
   },
   {
-    "caption": "Hukari: Add Latest Version of Lib",
+    "caption": "Hukari: Tab",
     "command": "tutkain_evaluate",
     "args": {
-        "scope": "input",
-        "snippet": "(hukari.repl/add-lib-latest \"${1}\")$0"
+        "code": "(hukari.repl/tab)"
     }
   },
 ]
