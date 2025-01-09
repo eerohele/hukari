@@ -4,8 +4,7 @@
             [clojure.core.server :as server]
             [clojure.datafy :refer [datafy]]
             [clojure.pprint :as pprint]
-            [hukari.jfr]
-            [clojure.string :as string])
+            [hukari.jfr])
   (:import (java.io PrintWriter StringWriter)
            (java.lang.management ManagementFactory)
            (java.nio.file Files)
