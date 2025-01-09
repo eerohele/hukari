@@ -784,3 +784,16 @@
          (.append writer "─"))
 
        (.flush writer)))))
+
+(defn gen
+  [x]
+  (cond
+    ((requiring-resolve 'clojure.test.check.generators/generator?) x)
+    ((requiring-resolve 'clojure.test.check.generators/generate) x)
+
+    (keyword? x)
+    ((requiring-resolve 'clojure.test.check.generators/generate)
+     ((requiring-resolve 'clojure.spec.alpha/gen) x))
+
+    :else
+    ((requiring-resolve 'malli.generator/generate) x)))
