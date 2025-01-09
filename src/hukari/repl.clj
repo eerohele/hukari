@@ -629,6 +629,18 @@
                             [2000 (cons ?duration-in-ms body)])]
       `(~time* ~duration (fn [] ~@body)))))
 
+(defmacro allocated-bytes
+  "Execute the body, then print a human-readable presentation of magnitude of
+  bytes that were allocated during the execution of the body."
+  [& body]
+  `(let [^com.sun.management.ThreadMXBean bean# (ManagementFactory/getThreadMXBean)
+         bytes-before# (.getCurrentThreadAllocatedBytes bean#)]
+     ~@body
+     (let [bytes-after# (.getCurrentThreadAllocatedBytes bean#)]
+       (println
+         (human-readable-byte-count (- bytes-after# bytes-before#))
+         "allocated"))))
+
 (defn set-reflection-warnings!
   "Given a regexp pattern and a boolean, for each namespace whose name matches
   the pattern, toggle reflection warnings on or off as indicated by the

@@ -165,10 +165,11 @@
     }
   },
   {
-    "caption": "Hukari: Portal",
+    "caption": "Hukari: Allocated Bytes",
     "command": "tutkain_evaluate",
     "args": {
-        "code": "(hukari.repl/portal)"
+        "scope": "form",
+        "code": "(hukari.repl/allocated-bytes $0)"
     }
   },
   {
