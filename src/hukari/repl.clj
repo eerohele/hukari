@@ -19,11 +19,14 @@
            (com.github.vertical_blank.sqlformatter.languages Dialect)))
 
 (defn start-server
-  [& {:keys [port] :or {port 0}}]
-  (let [server (server/start-server {:name "server" :port port :accept `server/repl :server-daemon false})
+  [{:keys [port dir] :or {port 0 dir "."}}]
+  (let [server (server/start-server {:name "server"
+                                     :port port
+                                     :accept `server/repl
+                                     :server-daemon false})
         port (.getLocalPort server)
         host (-> server .getInetAddress .getCanonicalHostName)
-        port-file (io/file ".repl-port")]
+        port-file (io/file dir ".repl-port")]
     (.deleteOnExit port-file)
     (spit port-file port)
     (printf "Socket server listening on %s:%s\n" host port)))
