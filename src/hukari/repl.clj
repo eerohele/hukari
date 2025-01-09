@@ -84,11 +84,11 @@
   [& body]
   `(do
      (require 'clj-async-profiler.core)
-     (clj-async-profiler.core/profile ~@body)))
+     (clj-async-profiler.core/profile {:features [:vtable :comptask]} ~@body)))
 
 (defn flamegraph
   []
-  ((requiring-resolve 'clj-async-profiler.core/serve-files) 10000)
+  ((requiring-resolve 'clj-async-profiler.core/serve-ui) 10000)
   ((requiring-resolve 'clojure.java.browse/browse-url) "http://localhost:10000"))
 
 ;; Ported from https://stackoverflow.com/a/3758880
