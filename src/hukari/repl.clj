@@ -46,7 +46,10 @@
   (set! *print-namespace-maps* false)
   (set! *print-length* 16)
   (set! *print-level* 8)
-  ((requiring-resolve 'clojure.spec.test.alpha/instrument))
+  (when-some [f (requiring-resolve 'clojure.spec.alpha/check-asserts)]
+    (f true))
+  (when-some [f (requiring-resolve 'clojure.spec.test.alpha/instrument)]
+    (f))
   #_(try
       (when-some [f (requiring-resolve 'malli.dev/start!)] (f))
       (catch java.io.FileNotFoundException _))
