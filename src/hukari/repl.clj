@@ -5,7 +5,8 @@
             [clojure.datafy :refer [datafy]]
             [clojure.pprint :as pprint]
             [hukari.jfr])
-  (:import (java.io PrintWriter StringWriter)
+  (:import (clojure.lang Atom)
+           (java.io PrintWriter StringWriter)
            (java.lang.management ManagementFactory)
            (java.nio.file Files)
            (java.nio.file.attribute FileAttribute)
@@ -16,6 +17,14 @@
            (org.openjdk.jol.info GraphLayout)
            (com.github.vertical_blank.sqlformatter SqlFormatter)
            (com.github.vertical_blank.sqlformatter.languages Dialect)))
+
+(defmethod print-method Atom
+  [x ^java.io.Writer w]
+  (.write w "#atom ")
+  (binding [*print-readably* true]
+    (print-method (deref x) w)))
+
+(comment (atom {:a 1}) ,,,)
 
 (defn start-server
   [{:keys [port dir] :or {port 0 dir "."}}]
