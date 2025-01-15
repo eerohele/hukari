@@ -25,6 +25,10 @@
   (binding [*print-readably* true]
     (print-method (deref x) w)))
 
+(defmethod print-dup Atom
+  [x ^java.io.Writer w]
+  (print-method x w))
+
 (comment (atom {:a 1}) ,,,)
 
 (defn start-server
