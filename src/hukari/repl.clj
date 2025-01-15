@@ -4,6 +4,7 @@
             [clojure.core.server :as server]
             [clojure.datafy :refer [datafy]]
             [clojure.pprint :as pprint]
+            [hukari.flyway]
             [hukari.jfr])
   (:import (clojure.lang Atom)
            (java.io PrintWriter StringWriter)
