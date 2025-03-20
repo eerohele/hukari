@@ -44,13 +44,6 @@
     (spit port-file port)
     (printf "Socket server listening on %s:%s (Java %s, PID %d)\n" host port (Runtime/version) (.pid (java.lang.ProcessHandle/current)))))
 
-(defn intern-utils
-  []
-  (require 'hato.client)
-  (create-ns 'http)
-  (doseq [[_ v] (ns-publics 'hato.client)]
-    (intern 'http (symbol (name (symbol v))) @v)))
-
 (defn init
   "Tutkain REPL init fn.
 
@@ -65,8 +58,7 @@
     (f))
   #_(try
       (when-some [f (requiring-resolve 'malli.dev/start!)] (f))
-      (catch java.io.FileNotFoundException _))
-  (intern-utils))
+      (catch java.io.FileNotFoundException _)))
 
 (defmacro portal
   []
