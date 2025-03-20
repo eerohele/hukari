@@ -16,4 +16,5 @@
         com.datomic/local {:mvn/version "1.0.285"}
         com.github.vertical-blank/sql-formatter {:mvn/version "2.0.5"}
         cheshire/cheshire {:mvn/version "5.13.0"}
-        org.flywaydb/flyway-core {:mvn/version "11.0.0"}}}
+        org.flywaydb/flyway-core {:mvn/version "11.0.0"}
+        io.github.tonsky/clojure-plus {:mvn/version "1.2.0"}}}

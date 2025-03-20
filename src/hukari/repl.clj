@@ -4,6 +4,8 @@
             [clojure.core.server :as server]
             [clojure.datafy :refer [datafy]]
             [clojure.pprint :as pprint]
+            [clojure+.error :as +error]
+            [clojure+.print :as +print]
             [hukari.flyway]
             [hukari.jfr])
   (:import (clojure.lang Atom)
@@ -19,17 +21,8 @@
            (com.github.vertical_blank.sqlformatter SqlFormatter)
            (com.github.vertical_blank.sqlformatter.languages Dialect)))
 
-(defmethod print-method Atom
-  [x ^java.io.Writer w]
-  (.write w "#atom ")
-  (binding [*print-readably* true]
-    (print-method (deref x) w)))
-
-(defmethod print-dup Atom
-  [x ^java.io.Writer w]
-  (print-method x w))
-
-(comment (atom {:a 1}) ,,,)
+(+print/install!)
+(+error/install!)
 
 (defn start-server
   [{:keys [port dir] :or {port 0 dir "."}}]
