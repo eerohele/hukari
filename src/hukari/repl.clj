@@ -42,7 +42,7 @@
         port-file (io/file dir ".repl-port")]
     (.deleteOnExit port-file)
     (spit port-file port)
-    (printf "Socket server listening on %s:%s\n" host port)))
+    (printf "Socket server listening on %s:%s (Java %s, PID %d)\n" host port (Runtime/version) (.pid (java.lang.ProcessHandle/current)))))
 
 (defn intern-utils
   []
