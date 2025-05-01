@@ -7,9 +7,6 @@
             [clojure+.error :as +error]
             [clojure+.print :as +print]
             [hukari.flyway]
-            [hukari.jfr])
-  (:import (clojure.lang Atom)
-           (java.io PrintWriter StringWriter)
            (java.lang.management ManagementFactory)
            (java.nio.file Files)
            (java.nio.file.attribute FileAttribute)
