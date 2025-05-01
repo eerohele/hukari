@@ -725,7 +725,6 @@
       (printf "%s=> " keypath)
       (flush)
       (let [input (read)]
-        (println input)
         (cond
           (= input 'q)
           :bye
@@ -741,41 +740,48 @@
           ")
             (recur keypath))
 
-          :else (let [v (get-in coll keypath)]
-                  (cond
-                    (and (= input '-) (empty? keypath))
-                    (do
-                      (print :top)
-                      (print v)
-                      (recur keypath))
+          (list? input)
+          (do
+            (print (eval input))
+            (recur keypath))
 
-                    (= input '-)
-                    (let [keypath (pop keypath)]
-                      (print (get-in coll keypath))
-                      (recur keypath))
+          :else (do
+                  (println input)
+                  (let [v (get-in coll keypath)]
+                    (cond
+                      (and (= input '-) (empty? keypath))
+                      (do
+                        (print :top)
+                        (print v)
+                        (recur keypath))
 
-                    (= input '.)
-                    (do
-                      (binding [*print-length* nil]
-                        (print v))
-                      (recur keypath))
+                      (= input '-)
+                      (let [keypath (pop keypath)]
+                        (print (get-in coll keypath))
+                        (recur keypath))
 
-                    (or (map? v) (indexed? v))
-                    (let [new-keypath (conj keypath input)]
-                      (if (contains? (get-in coll keypath) input)
-                        (do (print (get-in coll new-keypath))
-                          (recur new-keypath))
-                        (do (print :nope)
-                          (print (get-in coll keypath))
-                          (recur keypath))))
+                      (= input '.)
+                      (do
+                        (binding [*print-length* nil]
+                          (print v))
+                        (recur keypath))
 
-                    (and (seqable? v) (nat-int? input) (< input (count v)))
-                    (do
-                      (print (nth v input))
-                      (recur keypath))
+                      (or (map? v) (indexed? v))
+                      (let [new-keypath (conj keypath input)]
+                        (if (contains? (get-in coll keypath) input)
+                          (do (print (get-in coll new-keypath))
+                            (recur new-keypath))
+                          (do (print :nope)
+                            (print (get-in coll keypath))
+                            (recur keypath))))
 
-                    :else
-                    (do
-                      (print :nope)
-                      (print v)
-                      (recur keypath)))))))))
+                      (and (seqable? v) (nat-int? input) (< input (count v)))
+                      (do
+                        (print (nth v input))
+                        (recur keypath))
+
+                      :else
+                      (do
+                        (print :nope)
+                        (print v)
+                        (recur keypath))))))))))
