@@ -7,15 +7,18 @@
             [clojure+.error :as +error]
             [clojure+.print :as +print]
             [hukari.flyway]
+            [hukari.jfr])
+  (:import (java.io PrintWriter StringWriter)
            (java.lang.management ManagementFactory)
+           (java.net ServerSocket)
            (java.nio.file Files)
            (java.nio.file.attribute FileAttribute)
            (java.text StringCharacterIterator)
            (java.time Duration)
-           (java.util Base64 Date)
+           (java.util Base64 Base64$Decoder Base64$Encoder Date)
            (java.util.spi ToolProvider)
            (org.openjdk.jol.info GraphLayout)
-           (com.github.vertical_blank.sqlformatter SqlFormatter)
+           (com.github.vertical_blank.sqlformatter SqlFormatter SqlFormatter$Formatter)
            (com.github.vertical_blank.sqlformatter.languages Dialect)))
 
 (+print/install!)
@@ -23,10 +26,10 @@
 
 (defn start-server
   [{:keys [port dir] :or {port 0 dir "."}}]
-  (let [server (server/start-server {:name "server"
-                                     :port port
-                                     :accept `server/repl
-                                     :server-daemon false})
+  (let [^ServerSocket server (server/start-server {:name "server"
+                                                   :port port
+                                                   :accept `server/repl
+                                                   :server-daemon false})
         port (.getLocalPort server)
         host (-> server .getInetAddress .getCanonicalHostName)
         port-file (io/file dir ".repl-port")]
@@ -192,16 +195,16 @@
   (print-dep-weights '{cnuernber/dtype-next {:mvn/version "9.022"}})
   ,,,)
 
-(def ^:private base64-encoder (Base64/getEncoder))
+(def ^:private ^Base64$Encoder base64-encoder (Base64/getEncoder))
 
 (defn base64-encode
-  [s]
+  [^String s]
   (.encodeToString base64-encoder (.getBytes s)))
 
-(def ^:private base64-decoder (Base64/getDecoder))
+(def ^:private ^Base64$Decoder base64-decoder (Base64/getDecoder))
 
 (defn base64-decode
-  [s]
+  [^String s]
   (String. (.decode base64-decoder s) "UTF-8"))
 
 (comment
@@ -211,7 +214,7 @@
 (defn memory-layout
   [obj]
   (let [layout (GraphLayout/parseInstance (into-array [obj]))]
-    (map (fn [class]
+    (map (fn [^Class class]
            (let [count (.count (.getClassCounts layout) class)
                  size (.count (.getClassSizes layout) class)]
              {:description (.getName class)
@@ -252,14 +255,14 @@
 (defn bytecode
   [qualified-symbol]
   (with-open [outs (StringWriter.)
-              outp (PrintWriter. outs)
+              ^PrintWriter outp (PrintWriter. outs)
               errs (StringWriter.)
-              errp (PrintWriter. errs)]
+              ^PrintWriter errp (PrintWriter. errs)]
     (let [temp-dir (.toFile (Files/createTempDirectory "tutkain-classes-" (into-array FileAttribute [])))]
       (try
         (binding [*compile-path* (.getCanonicalPath temp-dir)]
           (some-> qualified-symbol namespace symbol compile)
-          (.run ^ToolProvider @javap outp errp (into-array String ["-c" "-l" "-verbose" "-constants" "-private" (class-path temp-dir qualified-symbol)]))
+          (.run ^ToolProvider @javap outp errp ^"[Ljava.lang.String;" (into-array String ["-c" "-l" "-verbose" "-constants" "-private" (class-path temp-dir qualified-symbol)]))
           (println (.toString outs)))
         (finally
           (.delete temp-dir))))))
@@ -285,7 +288,7 @@
      :bound? (.isBound this)
      :closed? (.isClosed this)
      :options (into {}
-                (for [option (.supportedOptions this)]
+                (for [^java.net.SocketOption option (.supportedOptions this)]
                   [(.name option) (datafy (.getOption this option))]))})
 
   java.lang.Thread
@@ -400,16 +403,16 @@
       :architecture (.getArch this)
       :available-processors (.getAvailableProcessors this)
       :system-load-average (.getSystemLoadAverage this)
-      :committed-virtual-size (.getCommittedVirtualMemorySize this)
-      :cpu-load (.getCpuLoad this)
-      :free-memory-size (.getFreeMemorySize this)
-      :free-physical-memory-size (.getFreePhysicalMemorySize this)
-      :free-swap-space-size (.getFreeSwapSpaceSize this)
-      :process-cpu-load (.getProcessCpuLoad this)
-      :process-cpu-time (Duration/ofNanos (.getProcessCpuTime this))
-      :total-memory-size (.getTotalMemorySize this)
-      :total-physical-memory-size (.getTotalPhysicalMemorySize this)
-      :total-swap-space-size (.getTotalSwapSpaceSize this)))
+      :committed-virtual-size (.getCommittedVirtualMemorySize ^com.sun.management.OperatingSystemMXBean this)
+      :cpu-load (.getCpuLoad ^com.sun.management.OperatingSystemMXBean this)
+      :free-memory-size (.getFreeMemorySize ^com.sun.management.OperatingSystemMXBean this)
+      :free-physical-memory-size (.getFreePhysicalMemorySize ^com.sun.management.OperatingSystemMXBean this)
+      :free-swap-space-size (.getFreeSwapSpaceSize ^com.sun.management.OperatingSystemMXBean this)
+      :process-cpu-load (.getProcessCpuLoad ^com.sun.management.OperatingSystemMXBean this)
+      :process-cpu-time (Duration/ofNanos (.getProcessCpuTime ^com.sun.management.OperatingSystemMXBean this))
+      :total-memory-size (.getTotalMemorySize ^com.sun.management.OperatingSystemMXBean this)
+      :total-physical-memory-size (.getTotalPhysicalMemorySize ^com.sun.management.OperatingSystemMXBean this)
+      :total-swap-space-size (.getTotalSwapSpaceSize ^com.sun.management.OperatingSystemMXBean this)))
 
   java.lang.management.ThreadInfo
   (datafy [this]
@@ -660,11 +663,11 @@
   (set-reflection-warnings! 'hukari.repl #"^hukari\..*" true)
   ,,,)
 
-(def ^:private sql-formatter
+(def ^:private ^SqlFormatter$Formatter sql-formatter
   (SqlFormatter/of Dialect/PostgreSql))
 
 (defn format-sql
-  [s]
+  [^String s]
   (println (.format sql-formatter s)))
 
 (defn file->bytes
