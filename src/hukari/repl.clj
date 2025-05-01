@@ -696,3 +696,15 @@
     ((requiring-resolve 'clojure.java.browse/browse-url)
      ((requiring-resolve 'tab.api/address) -tab))
     (alter-var-root #'-tab (fn [_] ((requiring-resolve 'tab.api/run))))))
+
+(defn codepoint [ch]
+  (format "0x%X" (int ch)))
+
+(defn hexify [bytes]
+  (let [hex [\0 \1 \2 \3 \4 \5 \6 \7 \8 \9 \a \b \c \d \e \f]
+        sb (StringBuilder.)]
+    (doseq [^byte b bytes]
+      (let [v (bit-and b 0xFF)]
+        (.append sb (hex (bit-shift-right v 4)))
+        (.append sb (hex (bit-and v 0x0F)))))
+    (.toString sb)))
