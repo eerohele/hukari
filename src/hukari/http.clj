@@ -137,9 +137,6 @@
   (:body @(json-request
             :method :get
             :uri "https://jsonplaceholder.typicode.com/todos/foo"))
-
-  
-  
   
   (import
     '(java.util.concurrent CountDownLatch Executors)
